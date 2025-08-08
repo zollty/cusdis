@@ -8,6 +8,13 @@
   let nickname = ''
   let email = ''
 
+  const savedData = sessionStorage.getItem('userInfo')
+  if (savedData) {
+      const userInfo = JSON.parse(savedData)
+      nickname = userInfo.nickname || ''
+      email = userInfo.email || ''
+  }
+
   let loading = false
 
   export let onSuccess
@@ -27,6 +34,18 @@
       alert(t('nickname_is_required'))
       return
     }
+
+    if (content.length > 5000) {
+      alert(t('content_is_too_long'))
+      return
+    }
+
+    const userInfo = {
+        nickname,
+        email,
+        timestamp: new Date().toISOString()
+    }
+    sessionStorage.setItem('userInfo', JSON.stringify(userInfo))
 
     try {
       loading = true
@@ -49,9 +68,9 @@
   }
 
   function teardown() {
-    content = ''
-    nickname = ''
-    email = ''
+    // content = ''
+    // nickname = ''
+    // email = ''
     onSuccess && onSuccess()
   }
 
@@ -63,7 +82,7 @@
       <label class="mb-2 block dark:text-gray-200" for="nickname">{t('nickname')}</label>
       <input
         name="nickname"
-        class="w-full p-2 border border-gray-200 bg-transparent dark:text-gray-100 dark:outline-none"
+        class="w-full border border-gray-200 bg-transparent dark:text-gray-100 dark:outline-none"
         type="text"
         title={t('nickname')}
         bind:value={nickname}
@@ -73,7 +92,7 @@
       <label class="mb-2 block dark:text-gray-200" for="email">{t('email')}</label>
       <input
         name="email"
-        class="w-full p-2 border border-gray-200 bg-transparent  dark:text-gray-100 dark:outline-none"
+        class="w-full border border-gray-200 bg-transparent  dark:text-gray-100 dark:outline-none"
         type="email"
         title={t('email')}
         bind:value={email}

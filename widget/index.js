@@ -4,6 +4,10 @@ const makeIframeContent = (target) => {
   const host = target.dataset.host || 'https://cusdis.com'
   const iframeJsPath = target.dataset.iframe || `${host}/js/iframe.umd.js`
   const cssPath = `${host}/js/style.css`
+  if (window.CUSDIS_APP_ID) {
+    target.dataset.appId = window.CUSDIS_APP_ID
+    console.log('get common appID: ' + target.dataset.appId)
+  }
   return `<!DOCTYPE html>
 <html>
   <head>
@@ -29,6 +33,54 @@ const makeIframeContent = (target) => {
 </html>`
 }
 
+function setIframeHeight(iframe) {
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+    const body = iframeDoc.body
+    const html = iframeDoc.documentElement
+
+    // 获取文档的实际高度
+    const height = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight,
+    )
+
+    // 设置iframe高度（加一点余量）
+    iframe.style.height = height + 'px' // + 5
+    console.log('设置高度: ' + height)
+  } catch (error) {
+    console.error('设置高度失败:', error)
+  }
+}
+
+// 跨域iframe：使用MutationObserver监听变化
+function setupMutationObserver(iframe) {
+  try {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
+
+    // 创建MutationObserver监听body变化
+    const observer = new MutationObserver(function () {
+      setIframeHeight(iframe)
+    })
+
+    // 配置观察选项
+    const config = {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    }
+
+    // 开始观察body元素
+    observer.observe(iframeDoc.body, config)
+  } catch (error) {
+    console.error('MutationObserver设置失败:', error)
+  }
+}
+
 let singleTonIframe
 function createIframe(target) {
   if (!singleTonIframe) {
@@ -39,6 +91,7 @@ function createIframe(target) {
   singleTonIframe.srcdoc = makeIframeContent(target)
   singleTonIframe.style.width = '100%'
   singleTonIframe.style.border = '0'
+  singleTonIframe.style.height = '310px'
 
   return singleTonIframe
 }
@@ -56,6 +109,12 @@ function postMessage(event, data) {
 }
 
 function listenEvent(iframe, target) {
+  // 先监听load事件
+  iframe.addEventListener('load', function () {
+    // 加载完成后，添加事件监听
+    setupMutationObserver(iframe)
+  })
+
   const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
   const onMessage = (e) => {

@@ -25,6 +25,7 @@
 
   function setMessage(msg) {
     message = msg
+    alert(msg)
   }
 
   $: {
@@ -94,6 +95,7 @@
 {#if !error}
   <div class:dark={theme === 'dark'}>
     {#if message}
+      <!--  style="margin-bottom: -1rem;margin-top: 1rem;" -->
       <div class="p-2 mb-4 bg-blue-500 text-white">
         {message}
       </div>
@@ -128,8 +130,6 @@
 
     <div class="my-8" />
 
-    <div class="text-center text-gray-500 dark:text-gray-100 text-xs">
-      <a class="underline " href="https://cusdis.com">{t('powered_by')}</a>
-    </div>
+    
   </div>
 {/if}

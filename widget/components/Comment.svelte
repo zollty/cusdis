@@ -34,20 +34,15 @@
     {comment.parsedCreatedAt}
   </div>
 
-  <div class="text-gray-500 my-2 dark:text-gray-200">
+  <div class="markdown-body my-2 dark:text-gray-200">
     {@html comment.parsedContent}
   </div>
-
-  {#if comment.replies.data.length > 0}
-    {#each comment.replies.data as child (child.id)}
-      <svelte:self isChild={true} comment={child} />
-    {/each}
-  {/if}
 
   <div>
     <button
       class="font-medium text-sm text-gray-500 dark:bg-transparent dark:text-gray-100"
       type="button"
+      style="color: #315da5"
       on:click={(_) => {
         showReplyForm = !showReplyForm
       }}>{t('reply_btn')}</button
@@ -56,7 +51,7 @@
 
 
   {#if showReplyForm}
-    <div class="mt-4 pl-4 border-l-2 border-gray-200">
+    <div class="mt-2 pl-4 border-l-2 border-gray-200">
       <Reply
         parentId={comment.id}
         onSuccess={() => {
@@ -64,6 +59,12 @@
         }}
       />
     </div>
+  {/if}
+
+  {#if comment.replies.data.length > 0}
+    {#each comment.replies.data as child (child.id)}
+      <svelte:self isChild={true} comment={child} />
+    {/each}
   {/if}
 
 

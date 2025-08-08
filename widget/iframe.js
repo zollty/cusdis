@@ -30,11 +30,11 @@ function requestResize() {
   postMessage('resize', document.documentElement.offsetHeight)
 }
 
-const resizeObserve = new MutationObserver(() => {
-  requestResize()
-})
+// const resizeObserve = new MutationObserver(() => {
+//   requestResize()
+// })
 
-resizeObserve.observe(target, {
-  childList: true,
-  subtree: true
-})
+// resizeObserve.observe(target, {
+//   childList: true,
+//   subtree: true
+// })
